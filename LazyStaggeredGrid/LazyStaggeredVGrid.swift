@@ -57,8 +57,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
             ScrollViewReader { scrollReaderProxy in
                 ScrollView {
                     let totalSpacing = horizontalSpacing * CGFloat(columns - 1)
-                    let contentWidth = geometryProxy.size.width - (horizontalSpacing * 2)
-                    let columnWidth = (contentWidth - totalSpacing) / CGFloat(columns)
+                    let columnWidth = (geometryProxy.size.width - totalSpacing) / CGFloat(columns)
                     let chunkedColumns = chunkColumns(
                         geometryProxy: geometryProxy,
                         items: items,
@@ -81,7 +80,6 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
                             }
                         }
                     }
-                    .padding(.horizontal, horizontalSpacing)
                 }
                 .coordinateSpace(name: Self.coordinateSpace)
                 .onPreferenceChange(StaggeredGridScrollOffsetPreferenceKey.self) { value in

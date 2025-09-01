@@ -128,7 +128,6 @@ struct ExampleLazyStaggeredVGridView: View {
         .padding()
     }
 
-    
     private var gridView: some View {
         LazyStaggeredVGrid(
             items: viewModel.items,
@@ -147,6 +146,7 @@ struct ExampleLazyStaggeredVGridView: View {
             .opacity(viewModel.focusedItemId == item.id ? 0.2 : 1.0)
             .animation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true), value: viewModel.focusedItemId)
         }
+        .padding(.horizontal)
     }
         
     let pyramidChunking: (GeometryProxy, [ExampleItem], Int, CGFloat, CGFloat, CGFloat) -> [[ExampleItem]] = { geometry, items, columns, columnWidth, verticalSpacing, horizontalSpacing in
