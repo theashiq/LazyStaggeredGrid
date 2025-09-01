@@ -1,5 +1,5 @@
 //
-//  ExampleLazyStaggeredVGridView.swift
+//  ExampleLazyStaggeredHGridView.swift
 //  LazyStaggeredGrid
 //
 //  Created by Ashiqur Rahman on 1/9/25.
@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct ExampleLazyStaggeredVGridView: View {
+struct ExampleLazyStaggeredHGridView: View {
     @StateObject var viewModel = ExampleLazyStaggeredGridViewModel()
     @State private var strategy: StaggeredGridChunkingStrategy<ExampleItem> = .roundRobin
 
     // MARK: Grid configuration
-    @State private var columns: Double = 3
+    @State private var rows: Double = 3
     @State private var verticalSpacing: CGFloat = 10
     @State private var horizontalSpacing: CGFloat = 10
     @State private var scrollToInstance: Int = 10
@@ -52,7 +52,7 @@ struct ExampleLazyStaggeredVGridView: View {
                     Button {
                         viewModel.scrollToTop()
                     } label: {
-                        Image(systemName: "chevron.up.circle")
+                        Image(systemName: "chevron.backward.circle")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 20, height: 20)
@@ -86,11 +86,11 @@ struct ExampleLazyStaggeredVGridView: View {
             
             Divider()
             
-            Section("Number of Columns") {
+            Section("Number of Rows") {
                 Divider()
                 HStack {
-                    Slider(value: $columns, in: 1.0...10.0, step: 1.0)
-                    Text("\(Int(columns))")
+                    Slider(value: $rows, in: 1.0...10.0, step: 1.0)
+                    Text("\(Int(rows))")
                 }
                 .padding(.horizontal)
             }
@@ -128,62 +128,62 @@ struct ExampleLazyStaggeredVGridView: View {
         .padding()
     }
 
+    
     private var gridView: some View {
-        LazyStaggeredVGrid(
+        LazyStaggeredHGrid(
             items: viewModel.items,
-            columns: Int(columns),
-            verticalSpacing: verticalSpacing,
+            rows: Int(rows),
             horizontalSpacing: horizontalSpacing,
+            verticalSpacing: verticalSpacing,
             scrollTo: $viewModel.scrollToID,
             scrollOffset: $viewModel.scrollOffset,
             widthByHeightRatio: { $0.widthByHeightRatio },
             chunkingStrategy: strategy,
             onItemTap: viewModel.focus
-        ) { item, height in
+        ) { item, width in
             ExampleItemView(item: item) {
                 viewModel.removeItem(item)
             }
             .opacity(viewModel.focusedItemId == item.id ? 0.2 : 1.0)
             .animation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true), value: viewModel.focusedItemId)
         }
-        .padding(.horizontal)
     }
         
-    let pyramidChunking: (GeometryProxy, [ExampleItem], Int, CGFloat, CGFloat, CGFloat) -> [[ExampleItem]] = { geometry, items, columns, columnWidth, verticalSpacing, horizontalSpacing in
-        var columnData = Array(repeating: [ExampleItem](), count: columns)
-        var heights = Array(repeating: CGFloat(0), count: columns)
+    let pyramidChunking: (GeometryProxy, [ExampleItem], Int, CGFloat, CGFloat, CGFloat) -> [[ExampleItem]] = { geometry, items, rows, rowHeight, verticalSpacing, horizontalSpacing in
+        var rowData = Array(repeating: [ExampleItem](), count: rows)
+        var widths = Array(repeating: CGFloat(0), count: rows)
         
-        let totalWidth = geometry.size.width
-        let isCompact = totalWidth < 400
+        let totalHeight = geometry.size.height
+        let isCompact = totalHeight < 400
         
         for item in items {
-            let baseHeight = columnWidth / max(item.widthByHeightRatio, 0.01)
-            let estimatedHeight = baseHeight + verticalSpacing
+            let baseWidth = rowHeight * max(item.widthByHeightRatio, 0.01)
+            let estimatedWidth = baseWidth + horizontalSpacing
             
-            // Add bias to center columns
-            var weightedHeights = heights.enumerated().map { index, height in
-                let centerBias = abs(Double(index - columns / 2)) // more bias further from center
-                return (index, height + CGFloat(centerBias) * (isCompact ? 10 : 5)) // boost outer columns
+            // Add bias to center rows
+            var weightedWidths = widths.enumerated().map { index, width in
+                let centerBias = abs(Double(index - rows / 2)) // more bias further from center
+                return (index, width + CGFloat(centerBias) * (isCompact ? 10 : 5)) // boost outer rows
             }
             
             // Add slight randomness when tied (visually helps)
-            if weightedHeights.allSatisfy({ $0.1 == weightedHeights.first?.1 }) {
-                weightedHeights.shuffle()
+            if weightedWidths.allSatisfy({ $0.1 == weightedWidths.first?.1 }) {
+                weightedWidths.shuffle()
             }
             
-            if let target = weightedHeights.min(by: { $0.1 < $1.1 })?.0 {
-                columnData[target].append(item)
-                heights[target] += estimatedHeight
+            if let target = weightedWidths.min(by: { $0.1 < $1.1 })?.0 {
+                rowData[target].append(item)
+                widths[target] += estimatedWidth
             }
         }
         
-        return columnData
+        return rowData
     }
 }
 
 
-struct ExampleLazyVerticalStaggeredGridView_Previews: PreviewProvider {
+struct ExampleLazyHorizontalStaggeredGridView_Previews: PreviewProvider {
     static var previews: some View {
-        ExampleLazyStaggeredVGridView()
+        ExampleLazyStaggeredHGridView()
     }
 }

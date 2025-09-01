@@ -1,5 +1,5 @@
 //
-//  ExampleLazyStaggeredVGridViewModel.swift
+//  ExampleLazyStaggeredGridViewModel.swift
 //  LazyStaggeredGrid
 //
 //  Created by Ashiqur Rahman on 1/9/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public class ExampleLazyStaggeredVGridViewModel: ObservableObject {
+public class ExampleLazyStaggeredGridViewModel: ObservableObject {
     @Published var scrollToID: UUID? = nil
     @Published var scrollOffset: CGFloat = 0
     @Published var items: [ExampleItem] = (0...99).map(ExampleItem.create)
