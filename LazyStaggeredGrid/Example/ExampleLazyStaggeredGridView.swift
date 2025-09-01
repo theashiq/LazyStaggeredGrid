@@ -28,10 +28,11 @@ struct ExampleLazyStaggeredGridView: View {
     public var body: some View {
         VStack {
             gridTypePicker
-            controls
             strategyPicker
+            controls
             gridView
         }
+        .padding(.horizontal)
     }
     
     private var gridTypePicker: some View {
@@ -41,82 +42,52 @@ struct ExampleLazyStaggeredGridView: View {
             }
         }
         .pickerStyle(SegmentedPickerStyle())
-        .padding()
     }
     
     private var controls: some View {
-        VStack {
-            Divider()
-            
-            HStack {
+        HStack {
+            Menu("Items") {
                 Button("Add 2 Items") {
                     viewModel.addItems()
                 }
-                Divider().frame(height: 16)
-                
                 Button("Clear All") {
                     viewModel.clearItems()
                 }
-                
-                Divider().frame(height: 16)
-                
                 Button("Scroll to: \(scrollToInstance)") {
                     viewModel.scrollTo(instanceNumber: scrollToInstance)
                     scrollToInstance = viewModel.items.indices.randomElement() ?? 0
                 }
-                .foregroundStyle(viewModel.items.contains {$0.instanceNumber == scrollToInstance} ? .blue : .secondary)
-                
                 if viewModel.scrollOffset < -100 {
-                    Divider().frame(height: 16)
                     Button {
                         viewModel.scrollToTop()
                     } label: {
-                        Image(systemName: selectedGridType == .vertical ? "chevron.up.circle" : "chevron.backward.circle")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20, height: 20)
-                    }
-                }
-            }
-            
-            Divider()
-            
-            Section("Spacing") {
-                Divider()
-                HStack {
-                    VStack {
-                        Text("Vertical")
                         HStack {
-                            Slider(value: $verticalSpacing, in: -10...20.0, step: 1.0)
-                            Text("\(Int(verticalSpacing))")
-                        }
-                    }
-                    Divider().frame(height: 16)
-                    VStack {
-                        Text("Horizontal")
-                        HStack {
-                            Slider(value: $horizontalSpacing, in: -10...20.0, step: 1.0)
-                            Text("\(Int(horizontalSpacing))")
+                            Text("Go to \(selectedGridType == .vertical ? "Top" : "Lead")")
+                            Image(systemName: selectedGridType == .vertical ? "chevron.up.circle" : "chevron.backward.circle")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
                         }
                     }
                 }
-                .padding(.horizontal)
             }
-            
-            Divider()
-            
-            Section("Number of \(selectedGridType == .vertical ? "Columns" : "Rows")") {
-                Divider()
-                HStack {
-                    Slider(value: $columnsOrRows, in: 1.0...10.0, step: 1.0)
-                    Text("\(Int(columnsOrRows))")
+            Menu("Sizing") {
+                ControlGroup {
+                    VStack {
+                        Text("Vertical Spacing: \(Int(verticalSpacing))").font(.subheadline)
+                        Slider(value: $verticalSpacing, in: -10...20.0, step: 1.0)
+                    }
+                    
+                    VStack {
+                        Text("Horizontal Spacing: \(Int(horizontalSpacing))").font(.subheadline)
+                        Slider(value: $horizontalSpacing, in: -10...20.0, step: 1.0)
+                    }
+                    VStack {
+                        Text("Number of \(selectedGridType == .vertical ? "Columns" : "Rows"): \(Int(columnsOrRows))").font(.subheadline)
+                        Slider(value: $columnsOrRows, in: 1.0...10.0, step: 1.0)
+                    }
                 }
-                .padding(.horizontal)
             }
-            
-            Divider()
         }
-        .padding([.horizontal, .top])
     }
     
     private var strategyPicker: some View {
@@ -144,7 +115,6 @@ struct ExampleLazyStaggeredGridView: View {
             Text("Custom(Pyramid)").tag(2)
         }
         .pickerStyle(SegmentedPickerStyle())
-        .padding()
     }
 
     private var gridView: some View {
