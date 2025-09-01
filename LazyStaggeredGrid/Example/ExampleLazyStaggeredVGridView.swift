@@ -106,6 +106,7 @@ struct ExampleLazyStaggeredVGridView: View {
                 switch strategy {
                 case .roundRobin: return 0
                 case .balanced: return 1
+                case .custom: return 2
                 }
             },
             set: { (index: Int) in
@@ -115,12 +116,13 @@ struct ExampleLazyStaggeredVGridView: View {
                 case 1:
                     strategy = .balanced
                 default:
-                    strategy = .balanced
+                    strategy = .custom(pyramidChunking)
                 }
             }
         )) {
             Text("Round Robin").tag(0)
             Text("Balanced").tag(1)
+            Text("Custom Example").tag(2)
         }
         .pickerStyle(SegmentedPickerStyle())
         .padding()
@@ -145,6 +147,37 @@ struct ExampleLazyStaggeredVGridView: View {
             .opacity(viewModel.focusedItemId == item.id ? 0.2 : 1.0)
             .animation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true), value: viewModel.focusedItemId)
         }
+    }
+        
+    let pyramidChunking: (GeometryProxy, [ExampleItem], Int, CGFloat, CGFloat, CGFloat) -> [[ExampleItem]] = { geometry, items, columns, columnWidth, verticalSpacing, horizontalSpacing in
+        var columnData = Array(repeating: [ExampleItem](), count: columns)
+        var heights = Array(repeating: CGFloat(0), count: columns)
+        
+        let totalWidth = geometry.size.width
+        let isCompact = totalWidth < 400
+        
+        for item in items {
+            let baseHeight = columnWidth / max(item.widthByHeightRatio, 0.01)
+            let estimatedHeight = baseHeight + verticalSpacing
+            
+            // Add bias to center columns
+            var weightedHeights = heights.enumerated().map { index, height in
+                let centerBias = abs(Double(index - columns / 2)) // more bias further from center
+                return (index, height + CGFloat(centerBias) * (isCompact ? 10 : 5)) // boost outer columns
+            }
+            
+            // Add slight randomness when tied (visually helps)
+            if weightedHeights.allSatisfy({ $0.1 == weightedHeights.first?.1 }) {
+                weightedHeights.shuffle()
+            }
+            
+            if let target = weightedHeights.min(by: { $0.1 < $1.1 })?.0 {
+                columnData[target].append(item)
+                heights[target] += estimatedHeight
+            }
+        }
+        
+        return columnData
     }
 }
 

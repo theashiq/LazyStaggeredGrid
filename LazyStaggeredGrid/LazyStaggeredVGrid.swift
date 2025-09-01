@@ -60,6 +60,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
                     let contentWidth = geometryProxy.size.width - (horizontalSpacing * 2)
                     let columnWidth = (contentWidth - totalSpacing) / CGFloat(columns)
                     let chunkedColumns = chunkColumns(
+                        geometryProxy: geometryProxy,
                         items: items,
                         columns: columns,
                         spacing: verticalSpacing,
@@ -111,6 +112,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
     }
     
     private func chunkColumns(
+        geometryProxy: GeometryProxy,
         items: [T],
         columns: Int,
         spacing: CGFloat,
@@ -145,9 +147,10 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
                 heights[minIndex] += estimatedHeight + spacingToAdd
                 columnData[minIndex].append(item)
             }
-            
             return columnData
             
+        case .custom(let callback):
+            return callback(geometryProxy, items, columns, columnWidth, verticalSpacing, horizontalSpacing)
         }
     }
 }

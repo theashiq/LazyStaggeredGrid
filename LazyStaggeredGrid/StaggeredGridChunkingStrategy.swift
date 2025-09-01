@@ -5,7 +5,17 @@
 //  Created by Ashiqur Rahman on 1/9/25.
 //
 
+import SwiftUI
+
 enum StaggeredGridChunkingStrategy<T> {
     case roundRobin
     case balanced
+    case custom((
+        _ geometry: GeometryProxy,
+        _ items: [T],
+        _ columns: Int,
+        _ columnWidth: CGFloat,
+        _ verticalSpacing: CGFloat,
+        _ horizontalSpacing: CGFloat
+    ) -> [[T]])
 }
