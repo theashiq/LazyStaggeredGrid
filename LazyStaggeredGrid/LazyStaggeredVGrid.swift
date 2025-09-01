@@ -24,6 +24,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
     @Binding var scrollTo: T.ID?
     @Binding var scrollOffset: CGFloat
     let widthByHeightRatio: (T) -> CGFloat
+    let chunkingStrategy: StaggeredGridChunkingStrategy<T>
     let onItemTap: (T) -> Void
     @ViewBuilder let itemView: (T, CGFloat) -> Content
     
@@ -35,6 +36,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         scrollTo: Binding<T.ID?> = .constant(nil),
         scrollOffset: Binding<CGFloat> = .constant(0),
         widthByHeightRatio: @escaping (T) -> CGFloat = { _ in 1.0 },
+        chunkingStrategy: StaggeredGridChunkingStrategy<T> = .roundRobin,
         onItemTap: @escaping (T) -> Void = { _ in },
         @ViewBuilder itemView: @escaping (T, CGFloat) -> Content
     ) {
@@ -45,6 +47,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         self._scrollTo = scrollTo
         self._scrollOffset = scrollOffset
         self.widthByHeightRatio = widthByHeightRatio
+        self.chunkingStrategy = chunkingStrategy
         self.onItemTap = onItemTap
         self.itemView = itemView
     }
@@ -56,7 +59,12 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
                     let totalSpacing = horizontalSpacing * CGFloat(columns - 1)
                     let contentWidth = geometryProxy.size.width - (horizontalSpacing * 2)
                     let columnWidth = (contentWidth - totalSpacing) / CGFloat(columns)
-                    let chunkedColumns = chunkColumns()
+                    let chunkedColumns = chunkColumns(
+                        items: items,
+                        columns: columns,
+                        spacing: verticalSpacing,
+                        columnWidth: columnWidth
+                    )
                     
                     scrollOffsetDetectorView
                     HStack(alignment: .top, spacing: horizontalSpacing) {
@@ -102,11 +110,44 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         .frame(height: 0)
     }
     
-    private func chunkColumns() -> [[T]] {
-        var columnData = Array(repeating: [T](), count: columns)
-        for (index, item) in items.enumerated() {
-            columnData[index % columns].append(item)
+    private func chunkColumns(
+        items: [T],
+        columns: Int,
+        spacing: CGFloat,
+        columnWidth: CGFloat
+    ) -> [[T]] {
+        switch chunkingStrategy {
+        case .roundRobin:
+            var columnData = Array(repeating: [T](), count: columns)
+            for (index, item) in items.enumerated() {
+                columnData[index % columns].append(item)
+            }
+            return columnData
+            
+        case .balanced:
+            var columnData = Array(repeating: [T](), count: columns)
+            var heights = Array(repeating: CGFloat(0), count: columns)
+            
+            for item in items {
+                let aspectRatio = max(widthByHeightRatio(item), 0.01)
+                let estimatedHeight = columnWidth / aspectRatio
+                
+                var minIndex = 0
+                var minHeight = heights[0]
+                for i in 1..<heights.count {
+                    if heights[i] < minHeight {
+                        minHeight = heights[i]
+                        minIndex = i
+                    }
+                }
+                
+                let spacingToAdd = heights[minIndex] > 0 ? spacing : 0
+                heights[minIndex] += estimatedHeight + spacingToAdd
+                columnData[minIndex].append(item)
+            }
+            
+            return columnData
+            
         }
-        return columnData
     }
 }

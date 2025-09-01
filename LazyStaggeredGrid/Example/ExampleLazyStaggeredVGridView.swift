@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ExampleLazyStaggeredVGridView: View {
     @StateObject var viewModel = ExampleLazyStaggeredVGridViewModel()
+    @State private var strategy: StaggeredGridChunkingStrategy<ExampleItem> = .roundRobin
 
     // MARK: Grid configuration
     @State private var columns: Double = 3
@@ -19,6 +20,7 @@ struct ExampleLazyStaggeredVGridView: View {
     public var body: some View {
         VStack {
             controls
+            strategyPicker
             gridView
         }
     }
@@ -98,6 +100,33 @@ struct ExampleLazyStaggeredVGridView: View {
         .padding([.horizontal, .top])
     }
     
+    private var strategyPicker: some View {
+        Picker("Strategy", selection: Binding(
+            get: {
+                switch strategy {
+                case .roundRobin: return 0
+                case .balanced: return 1
+                }
+            },
+            set: { (index: Int) in
+                switch index {
+                case 0:
+                    strategy = .roundRobin
+                case 1:
+                    strategy = .balanced
+                default:
+                    strategy = .balanced
+                }
+            }
+        )) {
+            Text("Round Robin").tag(0)
+            Text("Balanced").tag(1)
+        }
+        .pickerStyle(SegmentedPickerStyle())
+        .padding()
+    }
+
+    
     private var gridView: some View {
         LazyStaggeredVGrid(
             items: viewModel.items,
@@ -107,6 +136,7 @@ struct ExampleLazyStaggeredVGridView: View {
             scrollTo: $viewModel.scrollToID,
             scrollOffset: $viewModel.scrollOffset,
             widthByHeightRatio: { $0.widthByHeightRatio },
+            chunkingStrategy: strategy,
             onItemTap: viewModel.focus
         ) { item, height in
             ExampleItemView(item: item) {
