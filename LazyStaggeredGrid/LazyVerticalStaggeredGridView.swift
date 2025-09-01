@@ -12,6 +12,7 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
     let columns: Int
     let verticalSpacing: CGFloat
     let horizontalSpacing: CGFloat
+    @Binding var scrollTo: T.ID?
     let widthByHeightRatio: (T) -> CGFloat
     @ViewBuilder let itemView: (T, CGFloat) -> Content
     
@@ -20,6 +21,7 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
         columns: Int,
         verticalSpacing: CGFloat = 0,
         horizontalSpacing: CGFloat = 0,
+        scrollTo: Binding<T.ID?> = .constant(nil),
         widthByHeightRatio: @escaping (T) -> CGFloat = { _ in 1.0 },
         @ViewBuilder itemView: @escaping (T, CGFloat) -> Content
     ) {
@@ -27,6 +29,7 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
         self.columns = columns
         self.verticalSpacing = verticalSpacing
         self.horizontalSpacing = horizontalSpacing
+        self._scrollTo = scrollTo
         self.widthByHeightRatio = widthByHeightRatio
         self.itemView = itemView
     }
@@ -54,6 +57,13 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
                     }
                     .padding(.horizontal, horizontalSpacing)
                     .padding(.top, verticalSpacing)
+                }
+                .onChange(of: scrollTo) { targetID in
+                    if let targetID {
+                        withAnimation {
+                            scrollReaderProxy.scrollTo(targetID, anchor: .top)
+                        }
+                    }
                 }
             }
         }
