@@ -2,6 +2,7 @@ import SwiftUI
 
 public class ExampleLazyVerticalStaggeredGridViewModel: ObservableObject {
     @Published var scrollToID: UUID? = nil
+    @Published var scrollOffset: CGFloat = 0
     @Published var items: [ExampleItem] = (0...99).map(ExampleItem.create)
     @Published var focusedItemId: UUID? = nil
 
@@ -37,6 +38,15 @@ public class ExampleLazyVerticalStaggeredGridViewModel: ObservableObject {
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.focusedItemId = nil
+            }
+        }
+    }
+    
+    func scrollToTop() {
+        scrollToID = UUID()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
+            if let targetId = self.items.first?.id {
+                self.scrollToID = targetId
             }
         }
     }

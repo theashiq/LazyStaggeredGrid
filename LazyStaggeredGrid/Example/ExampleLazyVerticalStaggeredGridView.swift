@@ -31,6 +31,11 @@ struct ExampleLazyVerticalStaggeredGridView: View {
                 Button("Add 2 Items") {
                     viewModel.addItems()
                 }
+                Divider().frame(height: 16)
+                
+                Button("Clear All") {
+                    viewModel.clearItems()
+                }
                 
                 Divider().frame(height: 16)
                 
@@ -40,12 +45,19 @@ struct ExampleLazyVerticalStaggeredGridView: View {
                 }
                 .foregroundStyle(viewModel.items.contains {$0.index == scrollToIndex} ? .blue : .secondary)
                 
-                Divider().frame(height: 16)
-                
-                Button("Clear All") {
-                    viewModel.clearItems()
+                if viewModel.scrollOffset < -100 {
+                    Divider().frame(height: 16)
+                    Button {
+                        viewModel.scrollToTop()
+                    } label: {
+                        Image(systemName: "chevron.up.circle")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 20, height: 20)
+                    }
                 }
             }
+            
             Divider()
             
             Section("Spacing") {
@@ -93,6 +105,7 @@ struct ExampleLazyVerticalStaggeredGridView: View {
             verticalSpacing: verticalSpacing,
             horizontalSpacing: horizontalSpacing,
             scrollTo: $viewModel.scrollToID,
+            scrollOffset: $viewModel.scrollOffset,
             widthByHeightRatio: { $0.widthByHeightRatio }
         ) { item, height in
             ExampleItemView(item: item) {
@@ -100,9 +113,6 @@ struct ExampleLazyVerticalStaggeredGridView: View {
             }
             .opacity(viewModel.focusedItemId == item.id ? 0.2 : 1.0)
             .animation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true), value: viewModel.focusedItemId)
-            .onAppear {
-                print("appeared \(item.index)")
-            }
         }
     }
 }

@@ -7,12 +7,22 @@
 
 import SwiftUI
 
+fileprivate struct StaggeredGridViewScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = min(value, nextValue())
+    }
+}
+
 struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
+    private static var coordinateSpace: String { "coordinateSpace" }
+
     let items: [T]
     let columns: Int
     let verticalSpacing: CGFloat
     let horizontalSpacing: CGFloat
     @Binding var scrollTo: T.ID?
+    @Binding var scrollOffset: CGFloat
     let widthByHeightRatio: (T) -> CGFloat
     @ViewBuilder let itemView: (T, CGFloat) -> Content
     
@@ -22,6 +32,7 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
         verticalSpacing: CGFloat = 0,
         horizontalSpacing: CGFloat = 0,
         scrollTo: Binding<T.ID?> = .constant(nil),
+        scrollOffset: Binding<CGFloat> = .constant(0),
         widthByHeightRatio: @escaping (T) -> CGFloat = { _ in 1.0 },
         @ViewBuilder itemView: @escaping (T, CGFloat) -> Content
     ) {
@@ -30,6 +41,7 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
         self.verticalSpacing = verticalSpacing
         self.horizontalSpacing = horizontalSpacing
         self._scrollTo = scrollTo
+        self._scrollOffset = scrollOffset
         self.widthByHeightRatio = widthByHeightRatio
         self.itemView = itemView
     }
@@ -43,6 +55,7 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
                     let columnWidth = (contentWidth - totalSpacing) / CGFloat(columns)
                     let chunkedColumns = chunkColumns()
                     
+                    scrollOffsetDetectorView
                     HStack(alignment: .top, spacing: horizontalSpacing) {
                         ForEach(chunkedColumns.indices, id: \.self) { col in
                             LazyVStack(spacing: verticalSpacing) {
@@ -56,18 +69,35 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
                         }
                     }
                     .padding(.horizontal, horizontalSpacing)
-                    .padding(.top, verticalSpacing)
+                }
+                .coordinateSpace(name: Self.coordinateSpace)
+                .onPreferenceChange(StaggeredGridViewScrollOffsetPreferenceKey.self) { value in
+                    self.scrollOffset = value
                 }
                 .onChange(of: scrollTo) { targetID in
                     if let targetID {
-                        withAnimation {
-                            scrollReaderProxy.scrollTo(targetID, anchor: .top)
+                        DispatchQueue.main.async {
+                            withAnimation {
+                                scrollReaderProxy.scrollTo(targetID, anchor: .top)
+                            }
                         }
                     }
                 }
             }
         }
     }
+    
+    private var scrollOffsetDetectorView: some View {
+        GeometryReader { geometry in
+            Color.clear
+                .preference(
+                    key: StaggeredGridViewScrollOffsetPreferenceKey.self,
+                    value: geometry.frame(in: .named(Self.coordinateSpace)).minY
+                )
+        }
+        .frame(height: 0)
+    }
+    
     
     private func chunkColumns() -> [[T]] {
         var columnData = Array(repeating: [T](), count: columns)
