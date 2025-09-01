@@ -19,17 +19,23 @@ public class ExampleLazyVerticalStaggeredGridViewModel: ObservableObject {
             }
         }
     }
+    
+    func removeItem(_ item: ExampleItem) {
+        if let index = items.firstIndex(of: item) {
+            items.remove(at: index)
+        }
+    }
 
     func clearItems() {
         items.removeAll()
     }
     
     func scrollTo(index: Int) {
-        if items.indices.contains(index) {
-            scrollToID = items[index].id
-            focusedItemId = items[index].id
+        if let targetId = items.first(where: { $0.index == index })?.id {
+            scrollToID = targetId
+            focusedItemId = targetId
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.focusedItemId = nil
             }
         }

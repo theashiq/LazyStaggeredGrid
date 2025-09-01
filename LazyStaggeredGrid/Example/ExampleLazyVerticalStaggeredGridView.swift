@@ -38,6 +38,7 @@ struct ExampleLazyVerticalStaggeredGridView: View {
                     viewModel.scrollTo(index: scrollToIndex)
                     scrollToIndex = viewModel.items.indices.randomElement() ?? 0
                 }
+                .foregroundStyle(viewModel.items.contains {$0.index == scrollToIndex} ? .blue : .secondary)
                 
                 Divider().frame(height: 16)
                 
@@ -45,7 +46,6 @@ struct ExampleLazyVerticalStaggeredGridView: View {
                     viewModel.clearItems()
                 }
             }
-            
             Divider()
             
             Section("Spacing") {
@@ -95,19 +95,14 @@ struct ExampleLazyVerticalStaggeredGridView: View {
             scrollTo: $viewModel.scrollToID,
             widthByHeightRatio: { $0.widthByHeightRatio }
         ) { item, height in
-            Rectangle()
-                .fill(item.color)
-                .cornerRadius(8)
-                .overlay(
-                    Text("Index: \(item.index)")
-                        .foregroundColor(.white)
-                        .bold()
-                )
-                .opacity(viewModel.focusedItemId == item.id ? 0.2 : 1.0)
-                .animation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true), value: viewModel.focusedItemId)
-                .onAppear {
-                    print("appeared \(item.index)")
-                }
+            ExampleItemView(item: item) {
+                viewModel.removeItem(item)
+            }
+            .opacity(viewModel.focusedItemId == item.id ? 0.2 : 1.0)
+            .animation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true), value: viewModel.focusedItemId)
+            .onAppear {
+                print("appeared \(item.index)")
+            }
         }
     }
 }

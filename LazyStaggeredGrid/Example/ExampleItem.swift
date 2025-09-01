@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ExampleItem: Identifiable {
+struct ExampleItem: Identifiable, Hashable {
     let id: UUID = UUID()
     let color: Color
     let index: Int
