@@ -16,7 +16,7 @@ struct ExampleItemView: View {
             .fill(item.color)
             .cornerRadius(8)
             .overlay(
-                Text("Index: \(item.index)")
+                Text("Instance: \(item.instanceNumber)")
                     .foregroundColor(.white)
                     .bold()
             )

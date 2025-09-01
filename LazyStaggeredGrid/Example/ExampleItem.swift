@@ -10,23 +10,23 @@ import SwiftUI
 struct ExampleItem: Identifiable, Hashable {
     let id: UUID = UUID()
     let color: Color
-    let index: Int
+    let instanceNumber: Int
     let widthByHeightRatio: CGFloat
     
-    init(color: Color, index: Int, widthByHeightRatio: CGFloat) {
+    init(color: Color, instanceNumber: Int, widthByHeightRatio: CGFloat) {
         self.color = color
-        self.index = index
+        self.instanceNumber = instanceNumber
         self.widthByHeightRatio = widthByHeightRatio
     }
     
-    static func create( _ index: Int) -> Self {
+    static func create(instanceNumber: Int) -> Self {
         .init(
             color: Color(
                 red: .random(in: 0.3...1),
                 green: .random(in: 0.3...1),
                 blue: .random(in: 0.3...1)
             ),
-            index: index,
+            instanceNumber: instanceNumber,
             widthByHeightRatio: [0.7, 0.8, 1.0, 1.2, 1.4].randomElement()!
         )
     }

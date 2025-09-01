@@ -1,5 +1,5 @@
 //
-//  LazyVerticalStaggeredGridView.swift
+//  LazyStaggeredVGrid.swift
 //  LazyStaggeredGrid
 //
 //  Created by Ashiqur Rahman on 1/9/25.
@@ -7,15 +7,15 @@
 
 import SwiftUI
 
-fileprivate struct StaggeredGridViewScrollOffsetPreferenceKey: PreferenceKey {
+fileprivate struct StaggeredGridScrollOffsetPreferenceKey: PreferenceKey {
     static var defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = min(value, nextValue())
     }
 }
 
-struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
-    private static var coordinateSpace: String { "coordinateSpace" }
+struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
+    private static var coordinateSpace: String { "vGridCoordinateSpace" }
 
     let items: [T]
     let columns: Int
@@ -71,7 +71,7 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
                     .padding(.horizontal, horizontalSpacing)
                 }
                 .coordinateSpace(name: Self.coordinateSpace)
-                .onPreferenceChange(StaggeredGridViewScrollOffsetPreferenceKey.self) { value in
+                .onPreferenceChange(StaggeredGridScrollOffsetPreferenceKey.self) { value in
                     self.scrollOffset = value
                 }
                 .onChange(of: scrollTo) { targetID in
@@ -91,7 +91,7 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
         GeometryReader { geometry in
             Color.clear
                 .preference(
-                    key: StaggeredGridViewScrollOffsetPreferenceKey.self,
+                    key: StaggeredGridScrollOffsetPreferenceKey.self,
                     value: geometry.frame(in: .named(Self.coordinateSpace)).minY
                 )
         }

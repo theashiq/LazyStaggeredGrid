@@ -1,6 +1,13 @@
+//
+//  ExampleLazyStaggeredVGridViewModel.swift
+//  LazyStaggeredGrid
+//
+//  Created by Ashiqur Rahman on 1/9/25.
+//
+
 import SwiftUI
 
-public class ExampleLazyVerticalStaggeredGridViewModel: ObservableObject {
+public class ExampleLazyStaggeredVGridViewModel: ObservableObject {
     @Published var scrollToID: UUID? = nil
     @Published var scrollOffset: CGFloat = 0
     @Published var items: [ExampleItem] = (0...99).map(ExampleItem.create)
@@ -31,8 +38,8 @@ public class ExampleLazyVerticalStaggeredGridViewModel: ObservableObject {
         items.removeAll()
     }
     
-    func scrollTo(index: Int) {
-        if let targetId = items.first(where: { $0.index == index })?.id {
+    func scrollTo(instanceNumber: Int) {
+        if let targetId = items.first(where: { $0.instanceNumber == instanceNumber })?.id {
             scrollToID = targetId
             focusedItemId = targetId
             

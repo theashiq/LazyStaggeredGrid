@@ -1,5 +1,5 @@
 //
-//  ExampleLazyVerticalStaggeredGridView.swift
+//  ExampleLazyStaggeredVGridView.swift
 //  LazyStaggeredGrid
 //
 //  Created by Ashiqur Rahman on 1/9/25.
@@ -7,14 +7,14 @@
 
 import SwiftUI
 
-struct ExampleLazyVerticalStaggeredGridView: View {
-    @StateObject var viewModel = ExampleLazyVerticalStaggeredGridViewModel()
+struct ExampleLazyStaggeredVGridView: View {
+    @StateObject var viewModel = ExampleLazyStaggeredVGridViewModel()
 
     // MARK: Grid configuration
     @State private var columns: Double = 3
     @State private var verticalSpacing: CGFloat = 10
     @State private var horizontalSpacing: CGFloat = 10
-    @State private var scrollToIndex: Int = 10
+    @State private var scrollToInstance: Int = 10
     
     public var body: some View {
         VStack {
@@ -39,11 +39,11 @@ struct ExampleLazyVerticalStaggeredGridView: View {
                 
                 Divider().frame(height: 16)
                 
-                Button("Scroll to index \(scrollToIndex)") {
-                    viewModel.scrollTo(index: scrollToIndex)
-                    scrollToIndex = viewModel.items.indices.randomElement() ?? 0
+                Button("Scroll to: \(scrollToInstance)") {
+                    viewModel.scrollTo(instanceNumber: scrollToInstance)
+                    scrollToInstance = viewModel.items.indices.randomElement() ?? 0
                 }
-                .foregroundStyle(viewModel.items.contains {$0.index == scrollToIndex} ? .blue : .secondary)
+                .foregroundStyle(viewModel.items.contains {$0.instanceNumber == scrollToInstance} ? .blue : .secondary)
                 
                 if viewModel.scrollOffset < -100 {
                     Divider().frame(height: 16)
@@ -99,7 +99,7 @@ struct ExampleLazyVerticalStaggeredGridView: View {
     }
     
     private var gridView: some View {
-        LazyVerticalStaggeredGridView(
+        LazyStaggeredVGrid(
             items: viewModel.items,
             columns: Int(columns),
             verticalSpacing: verticalSpacing,
@@ -120,6 +120,6 @@ struct ExampleLazyVerticalStaggeredGridView: View {
 
 struct ExampleLazyVerticalStaggeredGridView_Previews: PreviewProvider {
     static var previews: some View {
-        ExampleLazyVerticalStaggeredGridView()
+        ExampleLazyStaggeredVGridView()
     }
 }
