@@ -33,6 +33,5 @@ struct ExampleLazyStaggeredVGridView: View {
             .opacity(viewModel.focusedItemId == item.id ? 0.2 : 1.0)
             .animation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true), value: viewModel.focusedItemId)
         }
-        .padding(.horizontal)
     }
 }
