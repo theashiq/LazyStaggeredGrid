@@ -10,20 +10,23 @@ import SwiftUI
 struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
     let items: [T]
     let columns: Int
-    let spacing: CGFloat
+    let verticalSpacing: CGFloat
+    let horizontalSpacing: CGFloat
     let widthByHeightRatio: (T) -> CGFloat
     @ViewBuilder let itemView: (T, CGFloat) -> Content
     
     init(
         items: [T],
         columns: Int,
-        spacing: CGFloat = 0,
+        verticalSpacing: CGFloat = 0,
+        horizontalSpacing: CGFloat = 0,
         widthByHeightRatio: @escaping (T) -> CGFloat = { _ in 1.0 },
         @ViewBuilder itemView: @escaping (T, CGFloat) -> Content
     ) {
         self.items = items
         self.columns = columns
-        self.spacing = spacing
+        self.verticalSpacing = verticalSpacing
+        self.horizontalSpacing = horizontalSpacing
         self.widthByHeightRatio = widthByHeightRatio
         self.itemView = itemView
     }
@@ -32,14 +35,14 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
         GeometryReader { geometryProxy in
             ScrollViewReader { scrollReaderProxy in
                 ScrollView {
-                    let totalSpacing = spacing * CGFloat(columns - 1)
-                    let contentWidth = geometryProxy.size.width - (spacing * 2)
+                    let totalSpacing = horizontalSpacing * CGFloat(columns - 1)
+                    let contentWidth = geometryProxy.size.width - (horizontalSpacing * 2)
                     let columnWidth = (contentWidth - totalSpacing) / CGFloat(columns)
                     let chunkedColumns = chunkColumns()
                     
-                    HStack(alignment: .top, spacing: spacing) {
+                    HStack(alignment: .top, spacing: horizontalSpacing) {
                         ForEach(chunkedColumns.indices, id: \.self) { col in
-                            LazyVStack(spacing: spacing) {
+                            LazyVStack(spacing: verticalSpacing) {
                                 ForEach(chunkedColumns[col]) { item in
                                     let height = columnWidth / max(widthByHeightRatio(item), 0.01)
                                     itemView(item, height)
@@ -49,8 +52,8 @@ struct LazyVerticalStaggeredGridView<T: Identifiable, Content: View>: View {
                             }
                         }
                     }
-                    .padding(.horizontal, spacing)
-                    .padding(.top, spacing)
+                    .padding(.horizontal, horizontalSpacing)
+                    .padding(.top, verticalSpacing)
                 }
             }
         }

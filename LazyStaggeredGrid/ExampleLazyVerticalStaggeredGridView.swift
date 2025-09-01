@@ -34,10 +34,35 @@ struct ExampleItem: Identifiable {
 
 struct ExampleLazyVerticalStaggeredGridView: View {
     @State private var columns: Int = 3
-    @State private var spacing: CGFloat = 10
+    @State private var verticalSpacing: CGFloat = 10
+    @State private var horizontalSpacing: CGFloat = 10
     
     public var body: some View {
-        LazyVerticalStaggeredGridView(items: (0...99).enumerated().map { ExampleItem.create($0.1) }, columns: columns, spacing: spacing, widthByHeightRatio: widthByHeightRatio) { item, height in
+        VStack {
+            controls
+            gridView
+        }
+    }
+    
+    private var controls: some View {
+        VStack {
+            HStack {
+                Text("Vertical Spacing:")
+                Slider(value: $verticalSpacing, in: 0...20.0, step: 1.0)
+                Text("\(Int(verticalSpacing))")
+            }
+            
+            HStack {
+                Text("Horizontal Spacing:")
+                Slider(value: $horizontalSpacing, in: 0...20.0, step: 1.0)
+                Text("\(Int(horizontalSpacing))")
+            }
+        }
+        .padding()
+    }
+    
+    private var gridView: some View {
+        LazyVerticalStaggeredGridView(items: (0...99).enumerated().map { ExampleItem.create($0.1) }, columns: columns, verticalSpacing: verticalSpacing, horizontalSpacing: horizontalSpacing, widthByHeightRatio: widthByHeightRatio) { item, height in
             Rectangle()
                 .fill(item.color)
                 .cornerRadius(8)
