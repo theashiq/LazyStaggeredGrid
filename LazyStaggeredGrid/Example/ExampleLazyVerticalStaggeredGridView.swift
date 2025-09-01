@@ -30,26 +30,58 @@ struct ExampleLazyVerticalStaggeredGridView: View {
     
     private var controls: some View {
         VStack {
-            Button("Scroll to index \(scrollToIndex)") {
-                if items.indices.contains(scrollToIndex) {
-                    viewModel.scrollToID = items[scrollToIndex].id
+            Divider()
+            
+            HStack {
+                Button("Add 2 Items") {
+                    let nextIndex = items.count
+                    let newItems = (nextIndex..<nextIndex + 2).map(ExampleItem.create)
+                    items.append(contentsOf: newItems)
+                    
+                    if let lastItem = newItems.last {
+                        viewModel.scrollToID = lastItem.id
+                    }
                 }
-                scrollToIndex = items.indices.randomElement() ?? 0
+                
+                Divider().frame(height: 16)
+                
+                Button("Scroll to index \(scrollToIndex)") {
+                    if items.indices.contains(scrollToIndex) {
+                        viewModel.scrollToID = items[scrollToIndex].id
+                    }
+                    scrollToIndex = items.indices.randomElement() ?? 0
+                }
+                
+                Divider().frame(height: 16)
+                
+                Button("Clear All") {
+                    items.removeAll()
+                }
             }
             
-            HStack {
-                Text("Vertical Spacing:")
-                Slider(value: $verticalSpacing, in: -10...20.0, step: 1.0)
-                Text("\(Int(verticalSpacing))")
+            Divider()
+            
+            Section("Spacing") {
+                HStack {
+                    Text("Vertical Spacing:").frame(width: UIScreen.main.bounds.width / 2, alignment: .trailing)
+                    HStack {
+                        Slider(value: $verticalSpacing, in: -10...20.0, step: 1.0)
+                        Text("\(Int(verticalSpacing))")
+                    }.frame(alignment: .leading)
+                }
+                
+                HStack {
+                    Text("Horizntal Spacing:").frame(width: UIScreen.main.bounds.width / 2, alignment: .trailing)
+                    HStack {
+                        Slider(value: $horizontalSpacing, in: -10...20.0, step: 1.0)
+                        Text("\(Int(horizontalSpacing))")
+                    }.frame(alignment: .leading)
+                }
             }
             
-            HStack {
-                Text("Horizontal Spacing:")
-                Slider(value: $horizontalSpacing, in: -10...20.0, step: 1.0)
-                Text("\(Int(horizontalSpacing))")
-            }
+            Divider()
         }
-        .padding()
+        .padding([.horizontal, .top])
     }
     
     private var gridView: some View {
