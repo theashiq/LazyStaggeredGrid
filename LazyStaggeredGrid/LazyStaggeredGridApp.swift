@@ -11,7 +11,7 @@ import SwiftUI
 struct LazyStaggeredGridApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ExampleLazyVerticalStaggeredGridView()
         }
     }
 }
