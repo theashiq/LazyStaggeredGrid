@@ -9,17 +9,12 @@ import SwiftUI
 
 struct ExampleLazyVerticalStaggeredGridView: View {
     @StateObject var viewModel = ExampleLazyVerticalStaggeredGridViewModel()
-    @State private var items: [ExampleItem]
-    
-    @State private var columns: Int = 3
+
+    // MARK: Grid configuration
+    @State private var columns: Double = 3
     @State private var verticalSpacing: CGFloat = 10
     @State private var horizontalSpacing: CGFloat = 10
     @State private var scrollToIndex: Int = 10
-
-    
-    public init() {
-        self.items = (0...99).map(ExampleItem.create)
-    }
     
     public var body: some View {
         VStack {
@@ -34,49 +29,56 @@ struct ExampleLazyVerticalStaggeredGridView: View {
             
             HStack {
                 Button("Add 2 Items") {
-                    let nextIndex = items.count
-                    let newItems = (nextIndex..<nextIndex + 2).map(ExampleItem.create)
-                    items.append(contentsOf: newItems)
-                    
-                    if let lastItem = newItems.last {
-                        viewModel.scrollToID = lastItem.id
-                    }
+                    viewModel.addItems()
                 }
                 
                 Divider().frame(height: 16)
                 
                 Button("Scroll to index \(scrollToIndex)") {
-                    if items.indices.contains(scrollToIndex) {
-                        viewModel.scrollToID = items[scrollToIndex].id
-                    }
-                    scrollToIndex = items.indices.randomElement() ?? 0
+                    viewModel.scrollTo(index: scrollToIndex)
+                    scrollToIndex = viewModel.items.indices.randomElement() ?? 0
                 }
                 
                 Divider().frame(height: 16)
                 
                 Button("Clear All") {
-                    items.removeAll()
+                    viewModel.clearItems()
                 }
             }
             
             Divider()
             
             Section("Spacing") {
+                Divider()
                 HStack {
-                    Text("Vertical Spacing:").frame(width: UIScreen.main.bounds.width / 2, alignment: .trailing)
-                    HStack {
-                        Slider(value: $verticalSpacing, in: -10...20.0, step: 1.0)
-                        Text("\(Int(verticalSpacing))")
-                    }.frame(alignment: .leading)
+                    VStack {
+                        Text("Vertical")
+                        HStack {
+                            Slider(value: $verticalSpacing, in: -10...20.0, step: 1.0)
+                            Text("\(Int(verticalSpacing))")
+                        }
+                    }
+                    Divider().frame(height: 16)
+                    VStack {
+                        Text("Horizontal")
+                        HStack {
+                            Slider(value: $horizontalSpacing, in: -10...20.0, step: 1.0)
+                            Text("\(Int(horizontalSpacing))")
+                        }
+                    }
                 }
-                
+                .padding(.horizontal)
+            }
+            
+            Divider()
+            
+            Section("Number of Columns") {
+                Divider()
                 HStack {
-                    Text("Horizntal Spacing:").frame(width: UIScreen.main.bounds.width / 2, alignment: .trailing)
-                    HStack {
-                        Slider(value: $horizontalSpacing, in: -10...20.0, step: 1.0)
-                        Text("\(Int(horizontalSpacing))")
-                    }.frame(alignment: .leading)
+                    Slider(value: $columns, in: 1.0...10.0, step: 1.0)
+                    Text("\(Int(columns))")
                 }
+                .padding(.horizontal)
             }
             
             Divider()
@@ -86,12 +88,12 @@ struct ExampleLazyVerticalStaggeredGridView: View {
     
     private var gridView: some View {
         LazyVerticalStaggeredGridView(
-            items: self.items,
-            columns: columns,
+            items: viewModel.items,
+            columns: Int(columns),
             verticalSpacing: verticalSpacing,
             horizontalSpacing: horizontalSpacing,
             scrollTo: $viewModel.scrollToID,
-            widthByHeightRatio: widthByHeightRatio
+            widthByHeightRatio: { $0.widthByHeightRatio }
         ) { item, height in
             Rectangle()
                 .fill(item.color)
@@ -101,14 +103,12 @@ struct ExampleLazyVerticalStaggeredGridView: View {
                         .foregroundColor(.white)
                         .bold()
                 )
+                .opacity(viewModel.focusedItemId == item.id ? 0.2 : 1.0)
+                .animation(.easeInOut(duration: 0.3).repeatCount(3, autoreverses: true), value: viewModel.focusedItemId)
                 .onAppear {
                     print("appeared \(item.index)")
                 }
         }
-    }
-    
-    private func widthByHeightRatio(item: ExampleItem) -> CGFloat {
-        return item.widthByHeightRatio
     }
 }
 
