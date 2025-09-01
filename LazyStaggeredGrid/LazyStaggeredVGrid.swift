@@ -24,6 +24,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
     @Binding var scrollTo: T.ID?
     @Binding var scrollOffset: CGFloat
     let widthByHeightRatio: (T) -> CGFloat
+    let onItemTap: (T) -> Void
     @ViewBuilder let itemView: (T, CGFloat) -> Content
     
     init(
@@ -34,6 +35,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         scrollTo: Binding<T.ID?> = .constant(nil),
         scrollOffset: Binding<CGFloat> = .constant(0),
         widthByHeightRatio: @escaping (T) -> CGFloat = { _ in 1.0 },
+        onItemTap: @escaping (T) -> Void = { _ in },
         @ViewBuilder itemView: @escaping (T, CGFloat) -> Content
     ) {
         self.items = items
@@ -43,6 +45,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         self._scrollTo = scrollTo
         self._scrollOffset = scrollOffset
         self.widthByHeightRatio = widthByHeightRatio
+        self.onItemTap = onItemTap
         self.itemView = itemView
     }
     
@@ -64,6 +67,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
                                     itemView(item, height)
                                         .frame(width: columnWidth, height: height)
                                         .id(item.id)
+                                        .onTapGesture { onItemTap(item) }
                                 }
                             }
                         }
@@ -97,7 +101,6 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         }
         .frame(height: 0)
     }
-    
     
     private func chunkColumns() -> [[T]] {
         var columnData = Array(repeating: [T](), count: columns)

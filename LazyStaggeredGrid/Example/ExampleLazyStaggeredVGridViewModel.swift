@@ -20,11 +20,7 @@ public class ExampleLazyStaggeredVGridViewModel: ObservableObject {
 
         if let lastItem = newItems.last {
             scrollToID = lastItem.id
-            focusedItemId = lastItem.id
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-                self.focusedItemId = nil
-            }
+            focus(item: lastItem)
         }
     }
     
@@ -39,13 +35,9 @@ public class ExampleLazyStaggeredVGridViewModel: ObservableObject {
     }
     
     func scrollTo(instanceNumber: Int) {
-        if let targetId = items.first(where: { $0.instanceNumber == instanceNumber })?.id {
-            scrollToID = targetId
-            focusedItemId = targetId
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self.focusedItemId = nil
-            }
+        if let scrollToItem = items.first(where: { $0.instanceNumber == instanceNumber }) {
+            scrollToID = scrollToItem.id
+            focus(item: scrollToItem)
         }
     }
     
@@ -55,6 +47,13 @@ public class ExampleLazyStaggeredVGridViewModel: ObservableObject {
             if let targetId = self.items.first?.id {
                 self.scrollToID = targetId
             }
+        }
+    }
+    
+    func focus(item: ExampleItem) {
+        focusedItemId = item.id
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.focusedItemId = nil
         }
     }
 }

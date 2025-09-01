@@ -106,7 +106,8 @@ struct ExampleLazyStaggeredVGridView: View {
             horizontalSpacing: horizontalSpacing,
             scrollTo: $viewModel.scrollToID,
             scrollOffset: $viewModel.scrollOffset,
-            widthByHeightRatio: { $0.widthByHeightRatio }
+            widthByHeightRatio: { $0.widthByHeightRatio },
+            onItemTap: viewModel.focus
         ) { item, height in
             ExampleItemView(item: item) {
                 viewModel.removeItem(item)

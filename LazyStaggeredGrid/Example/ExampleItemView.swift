@@ -28,6 +28,7 @@ struct ExampleItemView: View {
                     .padding(5)
                     .onTapGesture(perform: onCrossTapped)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    .contentShape(Rectangle())
             }
     }
 }
