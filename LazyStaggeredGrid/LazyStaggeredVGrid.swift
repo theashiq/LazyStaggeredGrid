@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-fileprivate struct StaggeredGridScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = min(value, nextValue())
-    }
-}
-
 struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
     private static var coordinateSpace: String { "vGridCoordinateSpace" }
 
@@ -106,7 +99,7 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
                     value: geometry.frame(in: .named(Self.coordinateSpace)).minY
                 )
         }
-        .frame(height: 0)
+        .frame(width: 0, height: 0)
     }
     
     private func chunkColumns(

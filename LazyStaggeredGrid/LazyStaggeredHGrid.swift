@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-fileprivate struct StaggeredHGridScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = min(value, nextValue())
-    }
-}
-
 struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
     private static var coordinateSpace: String { "hGridCoordinateSpace" }
     
@@ -85,7 +78,7 @@ struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
                     }
                 }
                 .coordinateSpace(name: Self.coordinateSpace)
-                .onPreferenceChange(StaggeredHGridScrollOffsetPreferenceKey.self) { value in
+                .onPreferenceChange(StaggeredGridScrollOffsetPreferenceKey.self) { value in
                     self.scrollOffset = value
                 }
                 .onChange(of: scrollTo) { targetID in
@@ -105,7 +98,7 @@ struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
         GeometryReader { geometry in
             Color.clear
                 .preference(
-                    key: StaggeredHGridScrollOffsetPreferenceKey.self,
+                    key: StaggeredGridScrollOffsetPreferenceKey.self,
                     value: geometry.frame(in: .named(Self.coordinateSpace)).minX
                 )
         }
