@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(macOS 10.15, *)
 public enum StaggeredGridChunkingStrategy<T> {
     case roundRobin
     case balanced

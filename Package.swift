@@ -7,7 +7,7 @@ let package = Package(
     name: "LazyStaggeredGrid",
     platforms: [
         .iOS(.v13),
-        .macOS(.v10_13),
+        .macOS(.v11),
         .watchOS(.v7)
     ],
     products: [
