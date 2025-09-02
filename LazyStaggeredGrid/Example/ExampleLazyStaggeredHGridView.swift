@@ -7,13 +7,35 @@
 
 import SwiftUI
 
-struct ExampleLazyStaggeredHGridView: View {
+struct ExampleLazyStaggeredHGridView<Header: View, Footer: View>: View {
     @ObservedObject var viewModel: ExampleLazyStaggeredGridViewModel
     var strategy: StaggeredGridChunkingStrategy<ExampleItem>
     var rows: Double
     var verticalSpacing: CGFloat
     var horizontalSpacing: CGFloat
     var scrollToInstance: Int
+    @ViewBuilder var header: () -> Header
+    @ViewBuilder var footer: () -> Footer
+    
+    init(
+        viewModel: ExampleLazyStaggeredGridViewModel,
+        strategy: StaggeredGridChunkingStrategy<ExampleItem>,
+        rows: Double,
+        verticalSpacing: CGFloat,
+        horizontalSpacing: CGFloat,
+        scrollToInstance: Int,
+        @ViewBuilder header: @escaping () -> Header = { EmptyView() },
+        @ViewBuilder footer: @escaping () -> Footer = { EmptyView() }
+    ) {
+        self.viewModel = viewModel
+        self.strategy = strategy
+        self.rows = rows
+        self.verticalSpacing = verticalSpacing
+        self.horizontalSpacing = horizontalSpacing
+        self.scrollToInstance = scrollToInstance
+        self.header = header
+        self.footer = footer
+    }
     
     var body: some View {
         LazyStaggeredHGrid(
@@ -25,7 +47,9 @@ struct ExampleLazyStaggeredHGridView: View {
             scrollOffset: $viewModel.scrollOffset,
             widthByHeightRatio: { $0.widthByHeightRatio },
             chunkingStrategy: strategy,
-            onItemTap: viewModel.focus
+            onItemTap: viewModel.focus,
+            header: header,
+            footer: footer
         ) { item, width in
             ExampleItemView(item: item) {
                 viewModel.removeItem(item)

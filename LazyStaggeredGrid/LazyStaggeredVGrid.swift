@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
+struct LazyStaggeredVGrid<T: Identifiable, Content: View, Header: View, Footer: View>: View where Header: View, Footer: View {
     private static var coordinateSpace: String { "vGridCoordinateSpace" }
 
     let items: [T]
@@ -20,6 +20,8 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
     let chunkingStrategy: StaggeredGridChunkingStrategy<T>
     let onItemTap: (T) -> Void
     @ViewBuilder let itemView: (T, CGFloat) -> Content
+    @ViewBuilder let header: () -> Header
+    @ViewBuilder let footer: () -> Footer
     
     init(
         items: [T],
@@ -31,6 +33,8 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         widthByHeightRatio: @escaping (T) -> CGFloat = { _ in 1.0 },
         chunkingStrategy: StaggeredGridChunkingStrategy<T> = .roundRobin,
         onItemTap: @escaping (T) -> Void = { _ in },
+        @ViewBuilder header: @escaping () -> Header = { EmptyView() },
+        @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },
         @ViewBuilder itemView: @escaping (T, CGFloat) -> Content
     ) {
         self.items = items
@@ -42,6 +46,8 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         self.widthByHeightRatio = widthByHeightRatio
         self.chunkingStrategy = chunkingStrategy
         self.onItemTap = onItemTap
+        self.header = header
+        self.footer = footer
         self.itemView = itemView
     }
     
@@ -49,29 +55,32 @@ struct LazyStaggeredVGrid<T: Identifiable, Content: View>: View {
         GeometryReader { geometryProxy in
             ScrollViewReader { scrollReaderProxy in
                 ScrollView {
-                    let totalSpacing = horizontalSpacing * CGFloat(columns - 1)
-                    let columnWidth = (geometryProxy.size.width - totalSpacing) / CGFloat(columns)
-                    let chunkedColumns = chunkColumns(
-                        geometryProxy: geometryProxy,
-                        items: items,
-                        columns: columns,
-                        spacing: verticalSpacing,
-                        columnWidth: columnWidth
-                    )
-                    
-                    scrollOffsetDetectorView
-                    HStack(alignment: .top, spacing: horizontalSpacing) {
-                        ForEach(chunkedColumns.indices, id: \.self) { col in
-                            LazyVStack(spacing: verticalSpacing) {
-                                ForEach(chunkedColumns[col]) { item in
-                                    let height = columnWidth / max(widthByHeightRatio(item), 0.01)
-                                    itemView(item, height)
-                                        .frame(width: columnWidth, height: height)
-                                        .id(item.id)
-                                        .onTapGesture { onItemTap(item) }
+                    VStack(spacing: 0) {
+                        let totalSpacing = horizontalSpacing * CGFloat(columns - 1)
+                        let columnWidth = (geometryProxy.size.width - totalSpacing) / CGFloat(columns)
+                        let chunkedColumns = chunkColumns(
+                            geometryProxy: geometryProxy,
+                            items: items,
+                            columns: columns,
+                            spacing: verticalSpacing,
+                            columnWidth: columnWidth
+                        )
+                        header()
+                        scrollOffsetDetectorView
+                        HStack(alignment: .top, spacing: horizontalSpacing) {
+                            ForEach(chunkedColumns.indices, id: \.self) { col in
+                                LazyVStack(spacing: verticalSpacing) {
+                                    ForEach(chunkedColumns[col]) { item in
+                                        let height = columnWidth / max(widthByHeightRatio(item), 0.01)
+                                        itemView(item, height)
+                                            .frame(width: columnWidth, height: height)
+                                            .id(item.id)
+                                            .onTapGesture { onItemTap(item) }
+                                    }
                                 }
                             }
                         }
+                        footer()
                     }
                 }
                 .coordinateSpace(name: Self.coordinateSpace)

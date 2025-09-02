@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
+struct LazyStaggeredHGrid<T: Identifiable, Content: View, Header: View, Footer: View>: View where Header: View, Footer: View {
     private static var coordinateSpace: String { "hGridCoordinateSpace" }
     
     let items: [T]
@@ -20,6 +20,8 @@ struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
     let chunkingStrategy: StaggeredGridChunkingStrategy<T>
     let onItemTap: (T) -> Void
     @ViewBuilder let itemView: (T, CGFloat) -> Content
+    @ViewBuilder let header: () -> Header
+    @ViewBuilder let footer: () -> Footer
     
     init(
         items: [T],
@@ -31,6 +33,8 @@ struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
         widthByHeightRatio: @escaping (T) -> CGFloat = { _ in 1.0 },
         chunkingStrategy: StaggeredGridChunkingStrategy<T> = .roundRobin,
         onItemTap: @escaping (T) -> Void = { _ in },
+        @ViewBuilder header: @escaping () -> Header = { EmptyView() },
+        @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },
         @ViewBuilder itemView: @escaping (T, CGFloat) -> Content
     ) {
         self.items = items
@@ -42,6 +46,8 @@ struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
         self.widthByHeightRatio = widthByHeightRatio
         self.chunkingStrategy = chunkingStrategy
         self.onItemTap = onItemTap
+        self.header = header
+        self.footer = footer
         self.itemView = itemView
     }
     
@@ -60,6 +66,7 @@ struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
                         rowHeight: rowHeight
                     )
                     HStack(spacing: 0) {
+                        header()
                         scrollOffsetDetectorView
                         VStack(alignment: .leading, spacing: verticalSpacing) {
                             ForEach(chunkedRows.indices, id: \.self) { row in
@@ -75,6 +82,7 @@ struct LazyStaggeredHGrid<T: Identifiable, Content: View>: View {
                                 .frame(height: rowHeight)
                             }
                         }
+                        footer()
                     }
                 }
                 .coordinateSpace(name: Self.coordinateSpace)

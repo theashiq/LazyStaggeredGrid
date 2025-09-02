@@ -140,16 +140,52 @@ struct ExampleLazyStaggeredGridView: View {
                     verticalSpacing: verticalSpacing,
                     horizontalSpacing: horizontalSpacing,
                     scrollToInstance: scrollToInstance
-                )
+                ) {
+                    Text("Vertical Grid Header")
+                        .font(.headline)
+                        .frame(height: 100)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue.opacity(0.3))
+                        .padding(.bottom, verticalSpacing)
+                } footer: {
+                    Text("Vertical Grid Footer")
+                        .font(.headline)
+                        .frame(height: 100)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.green.opacity(0.3))
+                        .padding(.top, verticalSpacing)
+                }
             } else {
-                ExampleLazyStaggeredHGridView(
-                    viewModel: viewModel,
-                    strategy: strategy,
-                    rows: columnsOrRows,
-                    verticalSpacing: verticalSpacing,
-                    horizontalSpacing: horizontalSpacing,
-                    scrollToInstance: scrollToInstance
-                )
+                HStack {
+                    ExampleLazyStaggeredHGridView(
+                        viewModel: viewModel,
+                        strategy: strategy,
+                        rows: columnsOrRows,
+                        verticalSpacing: verticalSpacing,
+                        horizontalSpacing: horizontalSpacing,
+                        scrollToInstance: scrollToInstance
+                    ) {
+                        Text("Horizontal Grid Header")
+                            .font(.headline)
+                            .fixedSize(horizontal: true, vertical: false)
+                            .rotationEffect(.degrees(-90))
+                            .frame(maxHeight: .infinity)
+                            .frame(width: 100)
+                            .background(Color.purple.opacity(0.3))
+                            .padding(.trailing, horizontalSpacing)
+                            .clipped()
+                    } footer: {
+                        Text("Horizontal Grid Footer")
+                            .font(.headline)
+                            .fixedSize(horizontal: true, vertical: false)
+                            .rotationEffect(.degrees(-90))
+                            .frame(maxHeight: .infinity)
+                            .frame(width: 100)
+                            .background(Color.purple.opacity(0.3))
+                            .padding(.leading, horizontalSpacing)
+                            .clipped()
+                    }
+                }
             }
         }
     }
