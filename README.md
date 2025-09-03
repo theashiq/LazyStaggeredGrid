@@ -16,6 +16,8 @@ While SwiftUI's built-in `LazyVGrid` and `LazyHGrid` provide efficient regular g
 -   **Scroll to Item:** Programmatically scroll to a specific item within the grid.
 -   **Header and Footer Support:** Add custom header and footer views to your staggered grids.
 
+-   **Scroll Indicator Control:** Show or hide scroll indicators with the `showsIndicators` parameter.
+
 ## Requirements
 
 -   iOS 13.0+
@@ -31,7 +33,7 @@ You can add `LazyStaggeredGrid` to your project using Swift Package Manager.
 
 1.  In Xcode, select `File > Add Packages...`.
 2.  Enter the repository URL: `https://github.com/theashiq/LazyStaggeredGrid.git`.
-3.  Choose the desired version (e.g., `Up to Next Major Version` with `1.0.0`).
+3.  Choose the desired version (e.g., `Up to Next Major Version` with `1.1.0`).
 4.  Click `Add Package`.
 
 ## Usage
@@ -46,9 +48,9 @@ struct MyVerticalGridView: View {
     let items = (0..<100).map { ExampleItem(id: UUID(), instanceNumber: $0) }
 
     var body: some View {
-        LazyStaggeredVGrid(items: items, columns: 3) { item, itemWidth in
+        LazyStaggeredVGrid(items: items, columns: 3) { item, width, height in
             Text("Item \(item.instanceNumber)")
-                .frame(width: itemWidth, height: CGFloat.random(in: 100...250))
+                .frame(width: width, height: height)
                 .background(Color.blue.opacity(0.5))
                 .cornerRadius(8)
         }
@@ -67,9 +69,9 @@ struct MyHorizontalGridView: View {
     let items = (0..<100).map { ExampleItem(id: UUID(), instanceNumber: $0) }
 
     var body: some View {
-        LazyStaggeredHGrid(items: items, rows: 3) { item, itemHeight in
+        LazyStaggeredHGrid(items: items, rows: 3) { item, width, height in
             Text("Item \(item.instanceNumber)")
-                .frame(width: CGFloat.random(in: 100...250), height: itemHeight)
+                .frame(width: width, height: height)
                 .background(Color.green.opacity(0.5))
                 .cornerRadius(8)
         }
@@ -88,11 +90,12 @@ LazyStaggeredVGrid(
     columns: 3,
     verticalSpacing: 10,
     horizontalSpacing: 10,
+    showsIndicators: true,
     scrollTo: $scrollToID,
     scrollOffset: $scrollOffset,
     widthByHeightRatio: { item in item.aspectRatio },
     chunkingStrategy: .balanced // or .roundRobin, .custom
-) { item, itemWidth in
+) { item, width, height in
     // Your custom item view here
 } header: {
     Text("My Custom Header")
