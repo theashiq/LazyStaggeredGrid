@@ -43,14 +43,15 @@ struct ExampleLazyStaggeredVGridView<Header: View, Footer: View>: View {
             columns: Int(columns),
             verticalSpacing: verticalSpacing,
             horizontalSpacing: horizontalSpacing,
-            scrollTo: $viewModel.scrollToID,
-            scrollOffset: $viewModel.scrollOffset,
             widthByHeightRatio: { $0.widthByHeightRatio },
             chunkingStrategy: strategy,
+            showsIndicators: true,
+            scrollTo: $viewModel.scrollToID,
+            scrollOffset: $viewModel.scrollOffset,
             onItemTap: viewModel.focus,
             header: header,
             footer: footer
-        ) { item, height in
+        ) { item, width, height in
             ExampleItemView(item: item) {
                 viewModel.removeItem(item)
             }
