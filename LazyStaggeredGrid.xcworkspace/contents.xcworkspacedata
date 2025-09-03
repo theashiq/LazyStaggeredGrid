@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "container:LazyStaggeredGrid"
+      name = "LazyStaggeredGrid">
+      <FileRef
+         location = "group:Package.swift">
+      </FileRef>
+      <Group
+         location = "group:Sources"
+         name = "Sources">
+         <FileRef
+            location = "group:StaggeredGridChunkingStrategy.swift">
+         </FileRef>
+         <FileRef
+            location = "group:LazyStaggeredVGrid.swift">
+         </FileRef>
+         <FileRef
+            location = "group:StaggeredGridScrollOffsetPreferenceKey.swift">
+         </FileRef>
+         <FileRef
+            location = "group:LazyStaggeredHGrid.swift">
+         </FileRef>
+      </Group>
+   </Group>
+   <Group
+      location = "group:LazyStaggeredGridExampleApp"
+      name = "LazyStaggeredGridExampleApp">
+      <Group
+         location = "group:LazyStaggeredGridExampleApp"
+         name = "LazyStaggeredGridExampleApp">
+         <FileRef
+            location = "group:Assets.xcassets">
+         </FileRef>
+         <Group
+            location = "group:Preview Content"
+            name = "Preview Content">
+            <FileRef
+               location = "group:Preview Assets.xcassets">
+            </FileRef>
+         </Group>
+         <FileRef
+            location = "group:LazyStaggeredGridExampleAppApp.swift">
+         </FileRef>
+         <FileRef
+            location = "group:ExampleItem.swift">
+         </FileRef>
+         <FileRef
+            location = "group:ExampleItemView.swift">
+         </FileRef>
+         <FileRef
+            location = "group:ExampleLazyStaggeredGridView.swift">
+         </FileRef>
+         <FileRef
+            location = "group:ExampleLazyStaggeredGridViewModel.swift">
+         </FileRef>
+         <FileRef
+            location = "group:ExampleLazyStaggeredHGridView.swift">
+         </FileRef>
+         <FileRef
+            location = "group:ExampleLazyStaggeredVGridView.swift">
+         </FileRef>
+         <FileRef
+            location = "group:ContentView.swift">
+         </FileRef>
+      </Group>
+      <FileRef
+         location = "group:LazyStaggeredGridExampleApp.xcodeproj">
+      </FileRef>
+   </Group>
+</Workspace>
