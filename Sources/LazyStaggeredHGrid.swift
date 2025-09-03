@@ -17,37 +17,40 @@ public struct LazyStaggeredHGrid<T: Identifiable, Content: View, Header: View, F
     let rows: Int
     let horizontalSpacing: CGFloat
     let verticalSpacing: CGFloat
-    @Binding var scrollTo: T.ID?
-    @Binding var scrollOffset: CGFloat
     let widthByHeightRatio: (T) -> CGFloat
     let chunkingStrategy: StaggeredGridChunkingStrategy<T>
-    let onItemTap: (T) -> Void
-    @ViewBuilder let itemView: (T, CGFloat) -> Content
+    let showsIndicators: Bool
+    @Binding var scrollTo: T.ID?
+    @Binding var scrollOffset: CGFloat
+    let onItemTap: (_ item: T) -> Void
     @ViewBuilder let header: () -> Header
     @ViewBuilder let footer: () -> Footer
-    
+    @ViewBuilder let itemView: (_ item: T, _ width: CGFloat, _ height: CGFloat) -> Content
+
     public init(
         items: [T],
         rows: Int,
         horizontalSpacing: CGFloat = 0,
         verticalSpacing: CGFloat = 0,
-        scrollTo: Binding<T.ID?> = .constant(nil),
-        scrollOffset: Binding<CGFloat> = .constant(0),
         widthByHeightRatio: @escaping (T) -> CGFloat = { _ in 1.0 },
         chunkingStrategy: StaggeredGridChunkingStrategy<T> = .roundRobin,
-        onItemTap: @escaping (T) -> Void = { _ in },
+        showsIndicators: Bool = false,
+        scrollTo: Binding<T.ID?> = .constant(nil),
+        scrollOffset: Binding<CGFloat> = .constant(0),
+        onItemTap: @escaping (_ item: T) -> Void = { _ in },
         @ViewBuilder header: @escaping () -> Header = { EmptyView() },
         @ViewBuilder footer: @escaping () -> Footer = { EmptyView() },
-        @ViewBuilder itemView: @escaping (T, CGFloat) -> Content
+        @ViewBuilder itemView: @escaping (_ item: T, _ width: CGFloat, _ height: CGFloat) -> Content
     ) {
         self.items = items
         self.rows = rows
         self.horizontalSpacing = horizontalSpacing
         self.verticalSpacing = verticalSpacing
-        self._scrollTo = scrollTo
-        self._scrollOffset = scrollOffset
         self.widthByHeightRatio = widthByHeightRatio
         self.chunkingStrategy = chunkingStrategy
+        self.showsIndicators = showsIndicators
+        self._scrollTo = scrollTo
+        self._scrollOffset = scrollOffset
         self.onItemTap = onItemTap
         self.header = header
         self.footer = footer
@@ -57,7 +60,7 @@ public struct LazyStaggeredHGrid<T: Identifiable, Content: View, Header: View, F
     public var body: some View {
         GeometryReader { geometryProxy in
             ScrollViewReader { scrollReaderProxy in
-                ScrollView(.horizontal) {
+                ScrollView(.horizontal, showsIndicators: showsIndicators) {
                     let totalSpacing = verticalSpacing * CGFloat(rows - 1)
                     let contentHeight = geometryProxy.size.height
                     let rowHeight = (contentHeight - totalSpacing) / CGFloat(rows)
@@ -76,7 +79,7 @@ public struct LazyStaggeredHGrid<T: Identifiable, Content: View, Header: View, F
                                 LazyHStack(spacing: horizontalSpacing) {
                                     ForEach(chunkedRows[row]) { item in
                                         let width = rowHeight * max(widthByHeightRatio(item), 0.01)
-                                        itemView(item, width)
+                                        itemView(item, width, rowHeight)
                                             .frame(width: width, height: rowHeight)
                                             .id(item.id)
                                             .onTapGesture { onItemTap(item) }
