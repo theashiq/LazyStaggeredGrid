@@ -10,7 +10,7 @@ import SwiftUI
 public class ExampleLazyStaggeredGridViewModel: ObservableObject {
     @Published var scrollToID: UUID? = nil
     @Published var scrollOffset: CGFloat = 0
-    @Published var items: [ExampleItem] = (0...30).map(ExampleItem.create)
+    @Published var items: [ExampleItem] = (0...300).map(ExampleItem.create)
     @Published var focusedItemId: UUID? = nil
 
     func addItems() {

@@ -12,6 +12,7 @@ import SwiftUI
 @available(watchOS 7.0, *)
 public struct LazyStaggeredVGrid<T: Identifiable, Content: View, Header: View, Footer: View>: View where Header: View, Footer: View {
     private static var coordinateSpace: String { "vGridCoordinateSpace" }
+    @State private var disabledScrolling: Bool = false
 
     let items: [T]
     let columns: Int
@@ -94,14 +95,18 @@ public struct LazyStaggeredVGrid<T: Identifiable, Content: View, Header: View, F
                     self.scrollOffset = value
                 }
                 .onChange(of: scrollTo) { targetID in
-                    if let targetID {
-                        DispatchQueue.main.async {
-                            withAnimation {
-                                scrollReaderProxy.scrollTo(targetID, anchor: .top)
-                            }
+                    disabledScrolling = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
+                        withAnimation {
+                            disabledScrolling = false
+                            scrollReaderProxy.scrollTo(targetID, anchor: .top)
                         }
                     }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
+                        scrollTo = nil
+                    }
                 }
+                .disabled(disabledScrolling)
             }
         }
     }
