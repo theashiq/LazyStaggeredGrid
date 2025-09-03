@@ -94,12 +94,13 @@ public struct LazyStaggeredVGrid<T: Identifiable, Content: View, Header: View, F
                 .onPreferenceChange(StaggeredGridScrollOffsetPreferenceKey.self) { value in
                     self.scrollOffset = value
                 }
-                .onChange(of: scrollTo) { targetID in
+                .onChange(of: scrollTo) { target in
+                    guard let target else { return }
                     disabledScrolling = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
                         withAnimation {
                             disabledScrolling = false
-                            scrollReaderProxy.scrollTo(targetID, anchor: .top)
+                            scrollReaderProxy.scrollTo(target, anchor: .top)
                         }
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
