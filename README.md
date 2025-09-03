@@ -112,7 +112,7 @@ LazyStaggeredVGrid(
 
 ## Examples
 
-For comprehensive usage examples and an interactive demonstration of `LazyStaggeredGrid`'s capabilities, please refer to the `Example` folder on the [`dev` branch](https://github.com/theashiq/LazyStaggeredGrid/tree/dev) of this repository.
+For comprehensive usage examples and an interactive demonstration of `LazyStaggeredGrid`'s capabilities, please refer to the `LazyStaggeredGridExampleApp` folder on the [example branch](https://github.com/theashiq/LazyStaggeredGrid/tree/example) of this repository.
 
 ## License
 
