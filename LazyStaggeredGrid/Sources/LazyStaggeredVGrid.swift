@@ -23,7 +23,6 @@ public struct LazyStaggeredVGrid<T: Identifiable, Content: View, Header: View, F
     let showsIndicators: Bool
     @Binding var scrollTo: T.ID?
     @Binding var scrollOffset: CGFloat
-    let onItemTap: (_ item: T) -> Void
     @ViewBuilder let header: () -> Header
     @ViewBuilder let footer: () -> Footer
     @ViewBuilder let itemView: (_ item: T, _ width: CGFloat, _ height: CGFloat) -> Content
@@ -52,7 +51,6 @@ public struct LazyStaggeredVGrid<T: Identifiable, Content: View, Header: View, F
         self.showsIndicators = showsIndicators
         self._scrollTo = scrollTo
         self._scrollOffset = scrollOffset
-        self.onItemTap = onItemTap
         self.header = header
         self.footer = footer
         self.itemView = itemView
@@ -82,7 +80,6 @@ public struct LazyStaggeredVGrid<T: Identifiable, Content: View, Header: View, F
                                         itemView(item, columnWidth, height)
                                             .frame(width: columnWidth, height: height)
                                             .id(item.id)
-                                            .onTapGesture { onItemTap(item) }
                                     }
                                 }
                             }
