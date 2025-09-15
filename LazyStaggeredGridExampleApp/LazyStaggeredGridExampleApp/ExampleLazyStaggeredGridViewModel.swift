@@ -42,7 +42,7 @@ public class ExampleLazyStaggeredGridViewModel: ObservableObject {
     }
     
     func scrollToTop() {
-        scrollToID = UUID()
+        scrollToID = nil
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) {
             if let targetId = self.items.first?.id {
                 self.scrollToID = targetId
