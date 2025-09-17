@@ -90,7 +90,9 @@ public struct LazyStaggeredHGrid<T: Identifiable, Content: View, Header: View, F
                 }
                 .coordinateSpace(name: Self.coordinateSpace)
                 .onPreferenceChange(StaggeredGridScrollOffsetPreferenceKey.self) { value in
-                    self.scrollOffset = value
+                    DispatchQueue.main.async {
+                        self.scrollOffset = value
+                    }
                 }
                 .onChange(of: scrollTo) { target in
                     guard let target else { return }
